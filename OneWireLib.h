@@ -36,16 +36,16 @@
 
 //tmp portadress var
 char PORTADDRESS;
-// Set the 1-Wire timing to 'standard' (standard=1) or 'overdrive' (standard=0).
+char PORTSWITCH;
 // 'tick' values
-int A,B,C,D,E,F,G,H,I,J;
+unsigned int A,B,C,D,E,F,G,H,I,J;
 
 ///Declarations of functions
 int outp(unsigned port, int databyte);
 int inp(unsigned port);
 
-void tickDelay(int tick);
-void portSetting(char port);
+void tickDelay(unsigned int tick);
+void portSetting(char port, char portswitch);
 
 void SetSpeed(char standard);
 
@@ -64,24 +64,27 @@ int OWOverdriveSkip(unsigned char *data, int data_len);
 
 // send 'databyte' to 'port'
 int outp(unsigned port, int databyte){
+    PORTSWITCH=0; //Swich as OUT
     port=databyte;
 }
 
 // read byte from 'port'
 int inp(unsigned port){
+    PORTSWITCH=1; //Switch as IN
     return port;
 }
 
 //simple delay fce
-void tickDelay(int tick){
+void tickDelay(unsigned int tick){
     for(int i=0;i<tick;i++)__delay_us(1);
 } 
 
-//simple port set fce
-void portSetting(char port){
+//simple port and IO setting
+void portSetting(char port, char portswitch){
     PORTADDRESS=port;
+    PORTSWITCH=portswitch;
 } 
-//
+// Set the 1-Wire timing to 'standard' (standard=1) or 'overdrive' (standard=0).
 void SetSpeed(char standard)
 {
         // Adjust tick values depending on speed

@@ -77,13 +77,15 @@
 #define demuxSelectSize 4
 #define numbersValueSize 4
 #define numbersDataSize 10
+#define testDataSize 8
 
 #define true 1
 #define false 0
 
 #define _XTAL_FREQ 4000000
 
-enum commands { cmd_convert=0x44 };
+enum commands { cmd_convert=0x44, cmd_copytoeeprom=0x48, cmd_skiprom=0xCC, cmd_readpowersuply=0xB4,
+cmd_8bitfamilycode=0x28, cmd_readROM=0x33, cmd_matchROM=0x55, cmd_writetoSRC=0x4E, cmd_readfromSRC=0xBE };
 
 char demuxSelect[]={0b00000000, 0b00000001, 0b00000010, 0b00000011};
 char demuxData[]={0xFF, 0xFF, 0xFF, 0xFF};
@@ -91,13 +93,15 @@ char demuxData[]={0xFF, 0xFF, 0xFF, 0xFF};
 char numbersData[]={ 0b11000000 /*0*/ ,0b11111001 /*1*/, 0b10100100  /*2*/,0b10110000 /*3*/,0b10011001 /*4*/,0b10010010 /*5*/,0b10000010 /*6*/,0b11111000 /*7*/,0b10000000 /*8*/,0b10010000 /*9*/};
 int numbersValue[]={0,0,0,0};
 
-char charsetData[]={0b11111101 /*-*/};
+char charsetData[]={0b10111111 /*-*/};
 
 char selectDot[]={0b11111111, 0b01111111};
 char dotSelector[]={false,true,false,false};
 int indexer=0;
 
-int temperatureData;
+unsigned int temperatureData, senzorPwrSupply, senzorROM;
+unsigned char familyName;
+
 bit readyFlag=false;
 
 void Init(){
@@ -105,10 +109,9 @@ void Init(){
     INTCON=0b11100000; //int setting, global,pir, timer0
     
     INTCON2bits.NOT_RBPU=1; //potrB pullup enable
-    WPUBbits.WPUB4=1;
+    //WPUBbits.WPUB4=1;
     
-    T0CON=0b01000010; //timer0 setting, PS 1/8 * 2 (FOST/4) 2ms
-    T1CON=0b00100010; //timer1 setting, PS 1/4 * 1 (FOST/4) 1us
+    T0CON=0b01000011; //timer0 setting, PS 1/16 * 2 (FOST/4) 128us
     
     ANSELD=0;
     TRISD=0;
@@ -126,6 +129,12 @@ void ClearDevice(){
     PORTD=0xFF;
     DMX_A=DMX_B=0;
     indexer=0;
+    readyFlag=false;
+    
+    senzorPwrSupply=0;
+    temperatureData=0;
+    familyName=0;
+    senzorROM=0;
 }
 void ClearDisplay(){
     for(int i=0;i<demuxSelectSize;i++){
@@ -149,24 +158,21 @@ void TestDevice(){
         __delay_ms(1);
         PORTE=demuxSelect[i];
        
-        for(int j=0;j<8;j++){
-            PORTD&=0x01;
-            PORTD>>=1;
+        PORTD=0b01111111;
+        for(int j=0;j<testDataSize;j++){
+            PORTD<<=1;
             __delay_ms(100);
         }
         PORTD=0x00;
         __delay_ms(250);
-    } 
+    }
+    PORTD=0xFF;
 }
 void parseValues(int F, int S){
         numbersValue[2]=S/10; 
         numbersValue[3]=S%10;
         numbersValue[0]=F/10; 
         numbersValue[1]=F%10;      
-}
-int configTemperatureSenzor(){
-    if(OWTouchReset())return 1;
-    else return 0;
 }
 void temeperatureDataConvertor(int data){
     int H=0,L=0;
@@ -175,23 +181,57 @@ void temeperatureDataConvertor(int data){
     parseValues(H,L);    
 }
 void readTemperature(){
-    T0CONbits.TMR0ON=0;
-    T1CONbits.TMR1ON=0;     
+    //T0CONbits.TMR0ON=0;     
     ClearDisplay();   
     
+    OWWriteByte(cmd_matchROM);
+    for(int i=1;i<=4;i++){
+        OWWriteByte((senzorROM>>(i*8)&0x00000000000000FF));
+    }
+    
+            
     temperatureData=0;
     OWWriteByte(cmd_convert); //Conver cmd
-    
     while(!OWReadBit()){
         __delay_us(1);
     }
-    temperatureData=OWReadByte();
+    OWWriteByte(cmd_readfromSRC); //Read memory 
+    
+    temperatureData|=OWReadByte();
+    temperatureData<<=8;
+    temperatureData|=OWReadByte();
     temeperatureDataConvertor(temperatureData);
     
-    T0CONbits.TMR0ON=1;
-    T1CONbits.TMR1ON=1;
+    //T0CONbits.TMR0ON=1;
 }
 
+void readPowerSuply(){
+    OWWriteByte(cmd_skiprom); //Skip-EEPROM
+    OWWriteByte(cmd_readpowersuply); //Read power supply
+    senzorPwrSupply==OWReadByte();
+    __delay_ms(1);
+}
+void readROM(){
+    
+    OWWriteByte(cmd_readROM); //Read ROM 
+    senzorROM|=OWReadByte();
+    senzorROM<<=8;
+    senzorROM|=OWReadByte();
+    senzorROM<<=8;
+    senzorROM|=OWReadByte();
+    senzorROM<<=8;
+    senzorROM|=OWReadByte();
+    
+    OWWriteByte(cmd_8bitfamilycode); //Read 8 bit family name
+    familyName=OWReadByte();
+    __delay_ms(1);
+}
+int configTemperatureSenzor(){
+    if(OWTouchReset())return 0;
+    readROM();
+    readPowerSuply();
+    return 1;
+}
 
 void main(void) {
     Init();
@@ -201,28 +241,42 @@ void main(void) {
     
     //OneWire setting
     SetSpeed(true);
-    portSetting(OneWirePort);
+    portSetting(OneWirePort,TRISBbits.RB4);
     
-    T0CONbits.TMR0ON=1;
-    T1CONbits.TMR1ON=1;
-    
+    for(int i=0;i<demuxSelectSize;i++){
+        demuxData[i]=charsetData[0];
+    }
     while(1){
         asm("NOP");
         asm("CLRWDT");
-        if(!readyFlag){
-            readyFlag=!configTemperatureSenzor();
-            for(int i=0;i<demuxSelectSize;i++){
-                demuxData[i]=charsetData[0];
-            }         
+        
+        while(!readyFlag){
+            readyFlag=configTemperatureSenzor();
+            T0CONbits.TMR0ON=1;
+            __delay_ms(1000);
+            T0CONbits.TMR0ON=0;
         }
-        else readTemperature();   
-        __delay_ms(100);
+        T0CONbits.TMR0ON=0;
+        readTemperature();  
+        T0CONbits.TMR0ON=1;
+        __delay_ms(500);
     }
 }
 
 void interrupt IRS(void){
     if(INTCONbits.TMR0IF){
         INTCONbits.TMR0IF=0;
+        
+        
+        for(int i=0;i<demuxSelectSize;i++){
+            if(demuxData[i]==charsetData[0])continue;
+            
+            if(numbersValue[i]>=numbersDataSize)numbersValue[i]=numbersDataSize-1;
+            if(numbersValue[i]<0)numbersValue[i]=0;
+            
+            demuxData[i]=numbersData[numbersValue[i]];
+            demuxData[i]&=selectDot[dotSelector[i]];
+        }  
         
         PORTD=0xFF;
         PORTE=demuxSelect[indexer];
@@ -233,14 +287,4 @@ void interrupt IRS(void){
          indexer++;
          if(indexer>=demuxSelectSize)indexer=0;
      }
-    if(PIR1bits.TMR1IF){
-        PIR1bits.TMR1IF=0;
-        for(int i=0;i<demuxSelectSize;i++){
-            if(numbersValue[i]>=numbersDataSize)numbersValue[i]=numbersDataSize-1;
-            if(numbersValue[i]<0)numbersValue[i]=0;
-            
-            demuxData[i]=numbersData[numbersValue[i]];
-            demuxData[i]&=selectDot[dotSelector[i]];
-        }    
-    }
 }
