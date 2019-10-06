@@ -35,17 +35,17 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 
 //tmp portadress var
-char PORTADDRESS;
-char PORTSWITCH;
+unsigned char PORTADDRESS;
+unsigned char PORTSWITCH;
 // 'tick' values
 unsigned int A,B,C,D,E,F,G,H,I,J;
 
 ///Declarations of functions
-int outp(unsigned port, int databyte);
-int inp(unsigned port);
+void outp(char databit);
+unsigned char inp();
 
 void tickDelay(unsigned int tick);
-void portSetting(char port, char portswitch);
+void portSetting(unsigned char port, unsigned char portswitch);
 
 void SetSpeed(char standard);
 
@@ -63,24 +63,26 @@ int OWOverdriveSkip(unsigned char *data, int data_len);
 ///Definitions of functions
 
 // send 'databyte' to 'port'
-int outp(unsigned port, int databyte){
-    PORTSWITCH=0; //Swich as OUT
-    port=databyte;
+void outp(char databit){
+    TRISCbits.RC2=!(databit & 0x01);
+    __delay_us(1);
+    PORTCbits.RC2=0;
 }
 
 // read byte from 'port'
-int inp(unsigned port){
-    PORTSWITCH=1; //Switch as IN
-    return port;
+unsigned char inp(){
+    TRISCbits.RC2=1;
+    __delay_us(1);
+    return PORTCbits.RC2;
 }
 
 //simple delay fce
 void tickDelay(unsigned int tick){
-    for(int i=0;i<tick;i++)__delay_us(1);
+    for(unsigned int i=0;i<tick;i++)__delay_us(1);
 } 
 
 //simple port and IO setting
-void portSetting(char port, char portswitch){
+void portSetting(unsigned char port, unsigned char portswitch){
     PORTADDRESS=port;
     PORTSWITCH=portswitch;
 } 
@@ -128,11 +130,11 @@ int OWTouchReset(void)
         int result;
 
         tickDelay(G);
-        outp(PORTADDRESS,0x00); // Drives DQ low
+        outp(0x00); // Drives DQ low
         tickDelay(H);
-        outp(PORTADDRESS,0x01); // Releases the bus
+        outp(0x01); // Releases the bus
         tickDelay(I);
-        for(int i=0;i<J;i++)result = inp(PORTADDRESS) ^ 0x01; // Sample for presence pulse from slave
+        for(unsigned int i=0;i<J;i++)result = inp() ^ 0x01; // Sample for presence pulse from slave
         tickDelay(J); // Complete the reset sequence recovery
         return result; // Return sample presence pulse result
 }
@@ -145,17 +147,17 @@ void OWWriteBit(int myBit)
         if (myBit)
         {
                 // Write '1' bit
-                outp(PORTADDRESS,0x00); // Drives DQ low
+                outp(0x00); // Drives DQ low
                 tickDelay(A);
-                outp(PORTADDRESS,0x01); // Releases the bus
+                outp(0x01); // Releases the bus
                 tickDelay(B); // Complete the time slot and 10us recovery
         }
         else
         {
                 // Write '0' bit
-                outp(PORTADDRESS,0x00); // Drives DQ low
+                outp(0x00); // Drives DQ low
                 tickDelay(C);
-                outp(PORTADDRESS,0x01); // Releases the bus
+                outp(0x01); // Releases the bus
                 tickDelay(D);
         }
 }
@@ -167,11 +169,11 @@ int OWReadBit(void)
 {
         int result;
 
-        outp(PORTADDRESS,0x00); // Drives DQ low
+        outp(0x00); // Drives DQ low
         tickDelay(A);
-        outp(PORTADDRESS,0x01); // Releases the bus
+        outp(0x01); // Releases the bus
         tickDelay(E);
-        result = inp(PORTADDRESS) & 0x01; // Sample the bit value from the slave
+        result = inp() & 0x01; // Sample the bit value from the slave
         tickDelay(F); // Complete the time slot and 10us recovery
 
         return result;
