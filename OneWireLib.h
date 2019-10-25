@@ -1,42 +1,42 @@
-/* Microchip Technology Inc. and its subsidiaries.  You may use this software 
- * and any derivatives exclusively with Microchip products. 
- * 
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER 
- * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED 
- * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A 
- * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION 
- * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION. 
+/* Microchip Technology Inc. and its subsidiaries.  You may use this software
+ * and any derivatives exclusively with Microchip products.
  *
- * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
- * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND 
- * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS 
- * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE 
- * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS 
- * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF 
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+ * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
+ * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
+ *
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS
+ * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF
  * ANY, THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
  *
- * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE 
- * TERMS. 
+ * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
+ * TERMS.
  */
 
-/* 
- * File:  OneWireLib     
+/*
+ * File:  OneWireLib
  * Author: Konecny
  * Comments:
- * Revision history: 
+ * Revision history:
  */
 
 // This is a guard condition so that contents of this file are not included
-// more than once.  
+// more than once.
 #ifndef XC_HEADER_TEMPLATE_H
 #define	XC_HEADER_TEMPLATE_H
 
 #define _XTAL_FREQ 4000000
-#include <xc.h> // include processor files - each processor file is guarded.  
+#include <xc.h> // include processor files - each processor file is guarded.
 
 //tmp portadress var
-unsigned char PORTADDRESS;
-unsigned char PORTSWITCH;
+static unsigned char PORTADDRESS;
+static unsigned char PORTSWITCH;
 // 'tick' values
 unsigned int A,B,C,D,E,F,G,H,I,J;
 
@@ -62,30 +62,28 @@ int OWOverdriveSkip(unsigned char *data, int data_len);
 
 ///Definitions of functions
 
-// send 'databyte' to 'port'
+// send 'databyte' to 'port' 0-LOW, 1-HIGH
 void outp(char databit){
-    TRISCbits.RC2=!(databit & 0x01);
-    __delay_us(1);
-    PORTCbits.RC2=0;
+    TRISAbits.RA2=(databit & 0x01);
+    asm("NOP");
+    PORTAbits.RA2=0;
 }
 
 // read byte from 'port'
 unsigned char inp(){
-    TRISCbits.RC2=1;
-    __delay_us(1);
-    return PORTCbits.RC2;
+    return PORTAbits.RA1;
 }
 
-//simple delay fce
+//simple delay fce 1/4 us
 void tickDelay(unsigned int tick){
-    for(unsigned int i=0;i<tick;i++)__delay_us(1);
-} 
+    for(unsigned int i=0;i<tick;i++)asm("NOP");
+}
 
 //simple port and IO setting
 void portSetting(unsigned char port, unsigned char portswitch){
     PORTADDRESS=port;
     PORTSWITCH=portswitch;
-} 
+}
 // Set the 1-Wire timing to 'standard' (standard=1) or 'overdrive' (standard=0).
 void SetSpeed(char standard)
 {
@@ -283,8 +281,8 @@ int OWOverdriveSkip(unsigned char *data, int data_len)
 extern "C" {
 #endif /* __cplusplus */
 
-    // TODO If C++ is being used, regular C code needs function names to have C 
-    // linkage so the functions can be used by the c code. 
+    // TODO If C++ is being used, regular C code needs function names to have C
+    // linkage so the functions can be used by the c code.
 
 #ifdef	__cplusplus
 }
