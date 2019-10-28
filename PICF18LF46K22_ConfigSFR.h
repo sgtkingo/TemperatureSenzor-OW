@@ -1,381 +1,120 @@
+/* Microchip Technology Inc. and its subsidiaries.  You may use this software 
+ * and any derivatives exclusively with Microchip products. 
+ * 
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER 
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED 
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A 
+ * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION 
+ * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION. 
+ *
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND 
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS 
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE 
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS 
+ * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF 
+ * ANY, THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+ *
+ * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE 
+ * TERMS. 
+ */
+
+/* 
+ * Author: Jiri Konecny
+ * Comments: Config header for PIC18LF46K22
+ */
+
+// This is a guard condition so that contents of this file are not included
+// more than once.  
+#ifndef PIC18LF46K22_SFR
+#define	PIC18LF46K22_SFR
+
+#include <xc.h> // include processor files - each processor file is guarded.
+#define true 1
+#define false 0
+
+#define _XTAL_FREQ 16000000
+
+// CONFIG1H
+#pragma config FOSC = INTIO67   // Oscillator Selection bits (Internal oscillator block)
+#pragma config PLLCFG = ON      // 4X PLL Enable (Oscillator multiplied by 4)
+#pragma config PRICLKEN = ON    // Primary clock enable bit (Primary clock is always enabled)
+#pragma config FCMEN = ON       // Fail-Safe Clock Monitor Enable bit (Fail-Safe Clock Monitor enabled)
+#pragma config IESO = OFF       // Internal/External Oscillator Switchover bit (Oscillator Switchover mode disabled)
+
+// CONFIG2L
+#pragma config PWRTEN = OFF     // Power-up Timer Enable bit (Power up timer disabled)
+#pragma config BOREN = ON       // Brown-out Reset Enable bits (Brown-out Reset enabled and controlled by software (SBOREN is enabled))
+#pragma config BORV = 190       // Brown Out Reset Voltage bits (VBOR set to 1.90 V nominal)
+
+// CONFIG2H
+#pragma config WDTEN = OFF      // Watchdog Timer Enable bits (Watch dog timer is always disabled. SWDTEN has no effect.)
+#pragma config WDTPS = 16384    // Watchdog Timer Postscale Select bits (1:16384)
+
+// CONFIG3H
+#pragma config CCP2MX = PORTC1  // CCP2 MUX bit (CCP2 input/output is multiplexed with RC1)
+#pragma config PBADEN = ON      // PORTB A/D Enable bit (PORTB<5:0> pins are configured as analog input channels on Reset)
+#pragma config CCP3MX = PORTB5  // P3A/CCP3 Mux bit (P3A/CCP3 input/output is multiplexed with RB5)
+#pragma config HFOFST = ON      // HFINTOSC Fast Start-up (HFINTOSC output and ready status are not delayed by the oscillator stable status)
+#pragma config T3CMX = PORTC0   // Timer3 Clock input mux bit (T3CKI is on RC0)
+#pragma config P2BMX = PORTD2   // ECCP2 B output mux bit (P2B is on RD2)
+#pragma config MCLRE = EXTMCLR  // MCLR Pin Enable bit (MCLR pin enabled, RE3 input pin disabled)
+
+// CONFIG4L
+#pragma config STVREN = ON      // Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)
+#pragma config LVP = ON         // Single-Supply ICSP Enable bit (Single-Supply ICSP enabled if MCLRE is also 1)
+#pragma config XINST = OFF      // Extended Instruction Set Enable bit (Instruction set extension and Indexed Addressing mode disabled (Legacy mode))
+
+// CONFIG5L
+#pragma config CP0 = OFF        // Code Protection Block 0 (Block 0 (000800-003FFFh) not code-protected)
+#pragma config CP1 = OFF        // Code Protection Block 1 (Block 1 (004000-007FFFh) not code-protected)
+#pragma config CP2 = OFF        // Code Protection Block 2 (Block 2 (008000-00BFFFh) not code-protected)
+#pragma config CP3 = OFF        // Code Protection Block 3 (Block 3 (00C000-00FFFFh) not code-protected)
+
+// CONFIG5H
+#pragma config CPB = OFF        // Boot Block Code Protection bit (Boot block (000000-0007FFh) not code-protected)
+#pragma config CPD = OFF        // Data EEPROM Code Protection bit (Data EEPROM not code-protected)
+
+// CONFIG6L
+#pragma config WRT0 = OFF       // Write Protection Block 0 (Block 0 (000800-003FFFh) not write-protected)
+#pragma config WRT1 = OFF       // Write Protection Block 1 (Block 1 (004000-007FFFh) not write-protected)
+#pragma config WRT2 = OFF       // Write Protection Block 2 (Block 2 (008000-00BFFFh) not write-protected)
+#pragma config WRT3 = OFF       // Write Protection Block 3 (Block 3 (00C000-00FFFFh) not write-protected)
+
+// CONFIG6H
+#pragma config WRTC = OFF       // Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) not write-protected)
+#pragma config WRTB = OFF       // Boot Block Write Protection bit (Boot Block (000000-0007FFh) not write-protected)
+#pragma config WRTD = OFF       // Data EEPROM Write Protection bit (Data EEPROM not write-protected)
+
+// CONFIG7L
+#pragma config EBTR0 = OFF      // Table Read Protection Block 0 (Block 0 (000800-003FFFh) not protected from table reads executed in other blocks)
+#pragma config EBTR1 = OFF      // Table Read Protection Block 1 (Block 1 (004000-007FFFh) not protected from table reads executed in other blocks)
+#pragma config EBTR2 = OFF      // Table Read Protection Block 2 (Block 2 (008000-00BFFFh) not protected from table reads executed in other blocks)
+#pragma config EBTR3 = OFF      // Table Read Protection Block 3 (Block 3 (00C000-00FFFFh) not protected from table reads executed in other blocks)
+
+// CONFIG7H
+#pragma config EBTRB = OFF      // Boot Block Table Read Protection bit (Boot Block (000000-0007FFh) not protected from table reads executed in other blocks)
+
+// #pragma config statements should precede project file includes.
+// Use project enums instead of #define for ON and OFF.
+
+//declared init fce
+void InitDevice();
+//declared clear fce
+void ClearDevice();
+//declared test fce
+void TestDevice();
 
-# 1 "RealTimeClock.c"
-
-# 26 "C:\Program Files (x86)\Microchip\xc8\v1.44\include\htc.h"
-extern const char __xc8_OPTIM_SPEED;
-
-extern double __fpnormalize(double);
+#ifdef	__cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
+    // TODO If C++ is being used, regular C code needs function names to have C 
+    // linkage so the functions can be used by the c code. 
 
-# 13 "C:\Program Files (x86)\Microchip\xc8\v1.44\include\xc8debug.h"
-#pragma intrinsic(__builtin_software_breakpoint)
-extern void __builtin_software_breakpoint(void);
+#ifdef	__cplusplus
+}
+#endif /* __cplusplus */
 
-# 50 "C:\Program Files (x86)\Microchip\xc8\v1.44\include\pic18lf46k22.h"
-extern volatile unsigned char ANSELA @ 0xF38;
+#endif	/* XC_HEADER_TEMPLATE_H */
 
-asm("ANSELA equ 0F38h");
-
-
-typedef union {
-struct {
-unsigned ANSA0 :1;
-unsigned ANSA1 :1;
-unsigned ANSA2 :1;
-unsigned ANSA3 :1;
-unsigned :1;
-unsigned ANSA5 :1;
-};
-} ANSELAbits_t;
-extern volatile ANSELAbits_t ANSELAbits @ 0xF38;
-
-# 95
-extern volatile unsigned char ANSELB @ 0xF39;
-
-asm("ANSELB equ 0F39h");
-
-
-typedef union {
-struct {
-unsigned ANSB0 :1;
-unsigned ANSB1 :1;
-unsigned ANSB2 :1;
-unsigned ANSB3 :1;
-unsigned ANSB4 :1;
-unsigned ANSB5 :1;
-};
-} ANSELBbits_t;
-extern volatile ANSELBbits_t ANSELBbits @ 0xF39;
-
-# 145
-extern volatile unsigned char ANSELC @ 0xF3A;
-
-asm("ANSELC equ 0F3Ah");
-
-
-typedef union {
-struct {
-unsigned :2;
-unsigned ANSC2 :1;
-unsigned ANSC3 :1;
-unsigned ANSC4 :1;
-unsigned ANSC5 :1;
-unsigned ANSC6 :1;
-unsigned ANSC7 :1;
-};
-} ANSELCbits_t;
-extern volatile ANSELCbits_t ANSELCbits @ 0xF3A;
-
-# 196
-extern volatile unsigned char ANSELD @ 0xF3B;
-
-asm("ANSELD equ 0F3Bh");
-
-
-typedef union {
-struct {
-unsigned ANSD0 :1;
-unsigned ANSD1 :1;
-unsigned ANSD2 :1;
-unsigned ANSD3 :1;
-unsigned ANSD4 :1;
-unsigned ANSD5 :1;
-unsigned ANSD6 :1;
-unsigned ANSD7 :1;
-};
-} ANSELDbits_t;
-extern volatile ANSELDbits_t ANSELDbits @ 0xF3B;
-
-# 258
-extern volatile unsigned char ANSELE @ 0xF3C;
-
-asm("ANSELE equ 0F3Ch");
-
-
-typedef union {
-struct {
-unsigned ANSE0 :1;
-unsigned ANSE1 :1;
-unsigned ANSE2 :1;
-};
-} ANSELEbits_t;
-extern volatile ANSELEbits_t ANSELEbits @ 0xF3C;
-
-# 290
-extern volatile unsigned char PMD2 @ 0xF3D;
-
-asm("PMD2 equ 0F3Dh");
-
-
-typedef union {
-struct {
-unsigned ADCMD :1;
-unsigned CMP1MD :1;
-unsigned CMP2MD :1;
-unsigned CTMUMD :1;
-};
-} PMD2bits_t;
-extern volatile PMD2bits_t PMD2bits @ 0xF3D;
-
-# 328
-extern volatile unsigned char PMD1 @ 0xF3E;
-
-asm("PMD1 equ 0F3Eh");
-
-
-typedef union {
-struct {
-unsigned CCP1MD :1;
-unsigned CCP2MD :1;
-unsigned CCP3MD :1;
-unsigned CCP4MD :1;
-unsigned CCP5MD :1;
-unsigned :1;
-unsigned MSSP1MD :1;
-unsigned MSSP2MD :1;
-};
-struct {
-unsigned EMBMD :1;
-};
-} PMD1bits_t;
-extern volatile PMD1bits_t PMD1bits @ 0xF3E;
-
-# 393
-extern volatile unsigned char PMD0 @ 0xF3F;
-
-asm("PMD0 equ 0F3Fh");
-
-
-typedef union {
-struct {
-unsigned TMR1MD :1;
-unsigned TMR2MD :1;
-unsigned TMR3MD :1;
-unsigned TMR4MD :1;
-unsigned TMR5MD :1;
-unsigned TMR6MD :1;
-unsigned UART1MD :1;
-unsigned UART2MD :1;
-};
-struct {
-unsigned :1;
-unsigned SPI1MD :1;
-unsigned SPI2MD :1;
-};
-} PMD0bits_t;
-extern volatile PMD0bits_t PMD0bits @ 0xF3F;
-
-# 470
-extern volatile unsigned char VREFCON2 @ 0xF40;
-
-asm("VREFCON2 equ 0F40h");
-
-
-extern volatile unsigned char DACCON1 @ 0xF40;
-
-asm("DACCON1 equ 0F40h");
-
-
-typedef union {
-struct {
-unsigned DACR :5;
-};
-struct {
-unsigned DACR0 :1;
-unsigned DACR1 :1;
-unsigned DACR2 :1;
-unsigned DACR3 :1;
-unsigned DACR4 :1;
-};
-} VREFCON2bits_t;
-extern volatile VREFCON2bits_t VREFCON2bits @ 0xF40;
-
-# 525
-typedef union {
-struct {
-unsigned DACR :5;
-};
-struct {
-unsigned DACR0 :1;
-unsigned DACR1 :1;
-unsigned DACR2 :1;
-unsigned DACR3 :1;
-unsigned DACR4 :1;
-};
-} DACCON1bits_t;
-extern volatile DACCON1bits_t DACCON1bits @ 0xF40;
-
-# 572
-extern volatile unsigned char VREFCON1 @ 0xF41;
-
-asm("VREFCON1 equ 0F41h");
-
-
-extern volatile unsigned char DACCON0 @ 0xF41;
-
-asm("DACCON0 equ 0F41h");
-
-
-typedef union {
-struct {
-unsigned DACNSS :1;
-unsigned :1;
-unsigned DACPSS :2;
-unsigned :1;
-unsigned DACOE :1;
-unsigned DACLPS :1;
-unsigned DACEN :1;
-};
-struct {
-unsigned :2;
-unsigned DACPSS0 :1;
-unsigned DACPSS1 :1;
-};
-} VREFCON1bits_t;
-extern volatile VREFCON1bits_t VREFCON1bits @ 0xF41;
-
-# 636
-typedef union {
-struct {
-unsigned DACNSS :1;
-unsigned :1;
-unsigned DACPSS :2;
-unsigned :1;
-unsigned DACOE :1;
-unsigned DACLPS :1;
-unsigned DACEN :1;
-};
-struct {
-unsigned :2;
-unsigned DACPSS0 :1;
-unsigned DACPSS1 :1;
-};
-} DACCON0bits_t;
-extern volatile DACCON0bits_t DACCON0bits @ 0xF41;
-
-# 692
-extern volatile unsigned char VREFCON0 @ 0xF42;
-
-asm("VREFCON0 equ 0F42h");
-
-
-extern volatile unsigned char FVRCON @ 0xF42;
-
-asm("FVRCON equ 0F42h");
-
-
-typedef union {
-struct {
-unsigned :4;
-unsigned FVRS :2;
-unsigned FVRST :1;
-unsigned FVREN :1;
-};
-struct {
-unsigned :4;
-unsigned FVRS0 :1;
-unsigned FVRS1 :1;
-};
-} VREFCON0bits_t;
-extern volatile VREFCON0bits_t VREFCON0bits @ 0xF42;
-
-# 743
-typedef union {
-struct {
-unsigned :4;
-unsigned FVRS :2;
-unsigned FVRST :1;
-unsigned FVREN :1;
-};
-struct {
-unsigned :4;
-unsigned FVRS0 :1;
-unsigned FVRS1 :1;
-};
-} FVRCONbits_t;
-extern volatile FVRCONbits_t FVRCONbits @ 0xF42;
-
-# 786
-extern volatile unsigned char CTMUICON @ 0xF43;
-
-asm("CTMUICON equ 0F43h");
-
-
-extern volatile unsigned char CTMUICONH @ 0xF43;
-
-asm("CTMUICONH equ 0F43h");
-
-
-typedef union {
-struct {
-unsigned IRNG :2;
-unsigned ITRIM :6;
-};
-struct {
-unsigned IRNG0 :1;
-unsigned IRNG1 :1;
-unsigned ITRIM0 :1;
-unsigned ITRIM1 :1;
-unsigned ITRIM2 :1;
-unsigned ITRIM3 :1;
-unsigned ITRIM4 :1;
-unsigned ITRIM5 :1;
-};
-} CTMUICONbits_t;
-extern volatile CTMUICONbits_t CTMUICONbits @ 0xF43;
-
-# 865
-typedef union {
-struct {
-unsigned IRNG :2;
-unsigned ITRIM :6;
-};
-struct {
-unsigned IRNG0 :1;
-unsigned IRNG1 :1;
-unsigned ITRIM0 :1;
-unsigned ITRIM1 :1;
-unsigned ITRIM2 :1;
-unsigned ITRIM3 :1;
-unsigned ITRIM4 :1;
-unsigned ITRIM5 :1;
-};
-} CTMUICONHbits_t;
-extern volatile CTMUICONHbits_t CTMUICONHbits @ 0xF43;
-
-# 936
-extern volatile unsigned char CTMUCONL @ 0xF44;
-
-asm("CTMUCONL equ 0F44h");
-
-
-extern volatile unsigned char CTMUCON1 @ 0xF44;
-
-asm("CTMUCON1 equ 0F44h");
-
-
-typedef union {
-struct {
-unsigned EDG1STAT :1;
-unsigned EDG2STAT :1;
-unsigned EDG1SEL :2;
-unsigned EDG1POL :1;
-unsigned EDG2SEL :2;
-unsigned EDG2POL :1;
-};
-struct {
-unsigned :2;
-unsigned EDG1SEL0 :1;
-unsigned EDG1SEL1 :1;
-unsigned :1;
-unsigned EDG2SEL0 :1;
-unsigned EDG2SEL1 :1;
-};
-} CTMUCONLbits_t;
-extern volatile CTMUCONLbits_t CTMUCONLbits @ 0xF44;
-
-# 1017
-typedef union {
-struct {
-unsigned EDG1STAT :1;
-unsigned EDG2STAT 

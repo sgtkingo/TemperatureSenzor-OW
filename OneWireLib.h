@@ -1,53 +1,48 @@
-/* Microchip Technology Inc. and its subsidiaries.  You may use this software
- * and any derivatives exclusively with Microchip products.
+/* Microchip Technology Inc. and its subsidiaries.  You may use this software 
+ * and any derivatives exclusively with Microchip products. 
+ * 
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER 
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED 
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A 
+ * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION 
+ * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION. 
  *
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER
- * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
- * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
- * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION
- * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION.
- *
- * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
- * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
- * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
- * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE
- * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS
- * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND 
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS 
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE 
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS 
+ * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF 
  * ANY, THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
  *
- * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
- * TERMS.
+ * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE 
+ * TERMS. 
  */
 
-/*
- * File:  OneWireLib
- * Author: Konecny
- * Comments:
- * Revision history:
+/* 
+ * Author: Jiri Konecny
+ * Comments: OweWire function header for PIC18LF46K22
  */
 
 // This is a guard condition so that contents of this file are not included
-// more than once.
-#ifndef XC_HEADER_TEMPLATE_H
-#define	XC_HEADER_TEMPLATE_H
+// more than once.  
+#ifndef OW_HEADER_TEMPLATE_H
+#define	OW_HEADER_TEMPLATE_H
 
-#define _XTAL_FREQ 4000000
-#include <xc.h> // include processor files - each processor file is guarded.
+#include <xc.h> // include processor files - each processor file is guarded.  
 
-//tmp portadress var
-static unsigned char PORTADDRESS;
-static unsigned char PORTSWITCH;
+//Pin INPUT and OUTPUT for OW
+#define P_W PORTAbits.RA2
+#define P_R PORTCbits.RC2
+
 // 'tick' values
-unsigned int A,B,C,D,E,F,G,H,I,J;
+static unsigned int A,B,C,D,E,F,G,H,I,J;
 
 ///Declarations of functions
-void outp(char databit);
-unsigned char inp();
+void tickDelay(int tick);
+void InitOneWire();
 
-void tickDelay(unsigned int tick);
-void portSetting(unsigned char port, unsigned char portswitch);
-
-void SetSpeed(char standard);
+void SetSpeed();
 
 int OWTouchReset(void);
 void OWWriteBit(int myBit);
@@ -62,60 +57,33 @@ int OWOverdriveSkip(unsigned char *data, int data_len);
 
 ///Definitions of functions
 
-// send 'databyte' to 'port' 0-LOW, 1-HIGH
-void outp(char databit){
-    TRISAbits.RA2=(databit & 0x01);
-    asm("NOP");
-    PORTAbits.RA2=0;
-}
+//Simple delay fce
+void tickDelay(int tick){
+    while(tick-->0);
+} 
 
-// read byte from 'port'
-unsigned char inp(){
-    return PORTAbits.RA1;
-}
-
-//simple delay fce 1/4 us
-void tickDelay(unsigned int tick){
-    for(unsigned int i=0;i<tick;i++)asm("NOP");
-}
-
-//simple port and IO setting
-void portSetting(unsigned char port, unsigned char portswitch){
-    PORTADDRESS=port;
-    PORTSWITCH=portswitch;
-}
-// Set the 1-Wire timing to 'standard' (standard=1) or 'overdrive' (standard=0).
-void SetSpeed(char standard)
+//Initialize OW 
+void InitOneWire(){
+    ANSELAbits.ANSA2=0; //Set I/O OW port as Din 
+    ANSELCbits.ANSC2=0; //Set I/O OW port as Din 
+    TRISCbits.RC2=1; //OW IN
+    TRISAbits.RA2=0; //OW OUT
+    SetSpeed();
+} 
+// Set the 1-Wire timing to 'standard' 
+void SetSpeed()
 {
-        // Adjust tick values depending on speed
-        if (standard)
-        {
-                // Standard Speed
-                A = 6 * 4;
-                B = 64 * 4;
-                C = 60 * 4;
-                D = 10 * 4;
-                E = 9 * 4;
-                F = 55 * 4;
-                G = 0;
-                H = 480 * 4;
-                I = 70 * 4;
-                J = 410 * 4;
-        }
-        else
-        {
-                // Overdrive Speed
-                A = 1.5 * 4;
-                B = 7.5 * 4;
-                C = 7.5 * 4;
-                D = 2.5 * 4;
-                E = 0.75 * 4;
-                F = 7 * 4;
-                G = 2.5 * 4;
-                H = 70 * 4;
-                I = 8.5 * 4;
-                J = 40 * 4;
-        }
+    // Standard Speed
+    A = 1;
+    B = 12;
+    C = 12;
+    D = 1;
+    E = 1;
+    F = 10;
+    G = 0;
+    H = 111;
+    I = 14;
+    J = 91;
 }
 
 //-----------------------------------------------------------------------------
@@ -128,11 +96,11 @@ int OWTouchReset(void)
         int result;
 
         tickDelay(G);
-        outp(0x00); // Drives DQ low
+        P_W=0x00; // Drives DQ low
         tickDelay(H);
-        outp(0x01); // Releases the bus
+        P_W=0x01; // Releases the bus
         tickDelay(I);
-        for(unsigned int i=0;i<J;i++)result = inp() ^ 0x01; // Sample for presence pulse from slave
+        result = P_R & 0x01; // Sample for presence pulse from slave
         tickDelay(J); // Complete the reset sequence recovery
         return result; // Return sample presence pulse result
 }
@@ -145,17 +113,17 @@ void OWWriteBit(int myBit)
         if (myBit)
         {
                 // Write '1' bit
-                outp(0x00); // Drives DQ low
+                P_W=0x00; // Drives DQ low
                 tickDelay(A);
-                outp(0x01); // Releases the bus
+                P_W=0x01; // Releases the bus
                 tickDelay(B); // Complete the time slot and 10us recovery
         }
         else
         {
                 // Write '0' bit
-                outp(0x00); // Drives DQ low
+                P_W=0x00; // Drives DQ low
                 tickDelay(C);
-                outp(0x01); // Releases the bus
+                P_W=0x01; // Releases the bus
                 tickDelay(D);
         }
 }
@@ -167,11 +135,11 @@ int OWReadBit(void)
 {
         int result;
 
-        outp(0x00); // Drives DQ low
+        P_W=0x00; // Drives DQ low
         tickDelay(A);
-        outp(0x01); // Releases the bus
+        P_W=0x01; // Releases the bus
         tickDelay(E);
-        result = inp() & 0x01; // Sample the bit value from the slave
+        result = P_R & 0x01; // Sample the bit value from the slave
         tickDelay(F); // Complete the time slot and 10us recovery
 
         return result;
@@ -255,38 +223,7 @@ void OWBlock(unsigned char *data, int data_len)
 }
 
 //-----------------------------------------------------------------------------
-// Set all devices on 1-Wire to overdrive speed. Return '1' if at least one
-// overdrive capable device is detected.
-//
-int OWOverdriveSkip(unsigned char *data, int data_len)
-{
-        // set the speed to 'standard'
-        SetSpeed(1);
 
-        // reset all devices
-        if (OWTouchReset()) // Reset the 1-Wire bus
-                return 0; // Return if no devices found
 
-        // overdrive skip command
-        OWWriteByte(0x3C);
-
-        // set the speed to 'overdrive'
-        SetSpeed(0);
-
-        // do a 1-Wire reset in 'overdrive' and return presence result
-        return OWTouchReset();
-}
-
-#ifdef	__cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-    // TODO If C++ is being used, regular C code needs function names to have C
-    // linkage so the functions can be used by the c code.
-
-#ifdef	__cplusplus
-}
-#endif /* __cplusplus */
-
-#endif	/* XC_HEADER_TEMPLATE_H */
+#endif	/* OW_HEADER_TEMPLATE_H */
 
