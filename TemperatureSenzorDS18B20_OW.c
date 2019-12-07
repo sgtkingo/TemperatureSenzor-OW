@@ -16,9 +16,16 @@ void InitDevice(){
 void ClearDevice(){
     PORTD=0x00;
 }
+
+void TestDevice(){
+    PORTD=0xFF;
+    __delay_ms(500);
+    PORTD=0x00;
+}
 void main(void) {
     InitDevice();
     ClearDevice();
+    TestDevice();
 
     while(configTemperatureSenzor(res_12b));   
     while(1){
@@ -26,5 +33,7 @@ void main(void) {
         asm("NOP");
         PORTD=getTempCelsia();
         __delay_ms(250);
+        //PORTD=getTempMiliCelsia();
+        //__delay_ms(250);
     }
 }

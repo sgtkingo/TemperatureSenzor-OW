@@ -33,7 +33,7 @@
 
 //Pin INPUT and OUTPUT for OW
 #define P_W PORTAbits.RA2
-#define P_R PORTCbits.RC2
+#define P_R PORTAbits.RA1
 
 // 'tick' values
 static unsigned int A,B,C,D,E,F,G,H,I,J;
@@ -65,8 +65,8 @@ void tickDelay(int tick){
 //Initialize OW 
 void InitOneWire(){
     ANSELAbits.ANSA2=0; //Set I/O OW port as Din 
-    ANSELCbits.ANSC2=0; //Set I/O OW port as Din 
-    TRISCbits.RC2=1; //OW IN
+    ANSELAbits.ANSA1=0; //Set I/O OW port as Din 
+    TRISAbits.RA1=1; //OW IN
     TRISAbits.RA2=0; //OW OUT
     SetSpeed();
 } 
