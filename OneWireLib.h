@@ -32,7 +32,7 @@
 #include <xc.h> // include processor files - each processor file is guarded.  
 
 //Pin INPUT and OUTPUT for OW
-#define P_W PORTAbits.RA2
+#define P_W PORTAbits.RA0
 #define P_R PORTAbits.RA1
 
 // 'tick' values
@@ -64,10 +64,10 @@ void tickDelay(int tick){
 
 //Initialize OW 
 void InitOneWire(){
-    ANSELAbits.ANSA2=0; //Set I/O OW port as Din 
+    ANSELAbits.ANSA0=0; //Set I/O OW port as Din 
     ANSELAbits.ANSA1=0; //Set I/O OW port as Din 
     TRISAbits.RA1=1; //OW IN
-    TRISAbits.RA2=0; //OW OUT
+    TRISAbits.RA0=0; //OW OUT
     SetSpeed();
 } 
 // Set the 1-Wire timing to 'standard' 

@@ -205,7 +205,10 @@ char getTempCelsia(){
     return tempCelsia;
 }
 char getTempMiliCelsia(){
-    return tempMiliCelsia;
+    float result=(float)tempMiliCelsia/16;
+    result*=100;
+    
+    return (char)result;
 }
 unsigned int getTemperatureData(){
     return tempCelsia;
